@@ -1,6 +1,7 @@
-// const express = require("express"); // "type": "commonjs", importing the 3rd party package it will work because 
+// const express = require("express"); // "type": "commonjs", importing the 3rd party package it will work because
 
 import express from "express"; // "type": "module",
+import { MongoClient } from "mongodb";
 
 const app = express();
 
@@ -78,22 +79,76 @@ const movies = [
   },
 ];
 
+const MONGO_URL = "mongodb://localhost";
+async function createConnection() {
+  const client = new MongoClient(MONGO_URL);
+  await client.connect();
+  console.log("Mongo is connected 🙋‍♂️🙋‍♂️☺️🌙");
+  return client; // becuase we are required to connect to client
+}
+// we have done globally to access by adding to some variable and await
+const client = await createConnection();
+
+// app.use -> intercept all the request | express.json() -> middleware -> parse into Json
+app.use(express.json());
+
 app.get("/", function (request, response) {
-    response.send("Hello 🌏🙋‍♂️❤️💥💥✊✊");
+  response.send("Hello 🌏🙋‍♂️❤️💥💥✊✊");
 });
 
-// /movies - task should return all the movies 
-app.get("/movies", function (request, response) {
+// /movies - task should return all the movies
+// app.get("/movies", function (request, response) {
+//   response.send(movies);
+// });
+
+// Curosor -> pagination
+app.get("/movies", async function (request, response) {
+    //db.movies.find({})
+    const movies = await client
+        .db("b27we")
+        .collection("movies")
+        .find({})
+        .toArray(); // converts cursor to array
     response.send(movies);
 });
 
+
 // :id we are passing to get only that movie details
-app.get("/movies/:id", function (request, response) {
-    console.log("request.params", request.params);
-    const {id} = request.params;
-    const movie = movies.find((mv) => mv.id === id);
-    response.send(movie);
+app.get("/movies/:id", async function (request, response) {
+  console.log("request.params", request.params);
+  const { id } = request.params;
+  //db.movies.findOne({id: "102"})
+  const movie = await client
+    .db("b27we")
+    .collection("movies")
+    .findOne({ id: id });
+  console.log(movie);
+  // const movie = movies.find((mv) => mv.id === id);
+  movie ? response.send(movie) : response.status(404).send({message: "No such movie found 😊"});
 });
+
+app.delete("/movies/:id", async function (request, response) {
+    console.log("request.params", request.params);
+    const { id } = request.params;
+    //db.movies.deleteOne({id: "102"})
+    const movie = await client
+      .db("b27we")
+      .collection("movies")
+      .deleteOneOne({ id: id });
+    console.log(movie);
+    response.send(result);
+  });
+
+app.post("/movies", async function (request, response) {
+    const newMovies = request.body;
+    console.log(newMovies);
+    // db.movies.insertMany(data)
+    const result = await client
+        .db("b27we")
+        .collection("movies")
+        .insertMany(newMovies);
+    response.send(result);
+  });
 
 app.listen(PORT, () => console.log(`Server is started in ${PORT}`));
 
