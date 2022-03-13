@@ -2,6 +2,11 @@
 
 import express from "express"; // "type": "module",
 import { MongoClient } from "mongodb";
+import dotenv from "dotenv";
+
+dotenv.config();
+console.log(process.env.MONGO_URL);
+
 
 const app = express();
 
@@ -79,7 +84,12 @@ const movies = [
   },
 ];
 
-const MONGO_URL = "mongodb://localhost";
+// const MONGO_URL = "mongodb://localhost";
+
+// Deployed url from the Atlas mongoDB
+// We have using the some process.env to get the some p details
+const MONGO_URL = process.env.MONGO_URL;
+
 async function createConnection() {
   const client = new MongoClient(MONGO_URL);
   await client.connect();
@@ -103,52 +113,66 @@ app.get("/", function (request, response) {
 
 // Curosor -> pagination
 app.get("/movies", async function (request, response) {
-    //db.movies.find({})
-    const movies = await client
-        .db("b27we")
-        .collection("movies")
-        .find({})
-        .toArray(); // converts cursor to array
-    response.send(movies);
+  //db.movies.find({})
+  const movies = await client
+    .db("b27we")
+    .collection("movies")
+    .find({})
+    .toArray(); // converts cursor to array
+  response.send(movies);
 });
-
 
 // :id we are passing to get only that movie details
 app.get("/movies/:id", async function (request, response) {
   console.log("request.params", request.params);
   const { id } = request.params;
-  //db.movies.findOne({id: "102"})
+  //db.movies.findOne({id: "104"})
   const movie = await client
     .db("b27we")
     .collection("movies")
     .findOne({ id: id });
   console.log(movie);
   // const movie = movies.find((mv) => mv.id === id);
-  movie ? response.send(movie) : response.status(404).send({message: "No such movie found 😊"});
+  movie
+    ? response.send(movie)
+    : response.status(404).send({ message: "No such movie found 😊" });
 });
 
 app.delete("/movies/:id", async function (request, response) {
-    console.log("request.params", request.params);
-    const { id } = request.params;
-    //db.movies.deleteOne({id: "102"})
-    const movie = await client
-      .db("b27we")
-      .collection("movies")
-      .deleteOneOne({ id: id });
-    console.log(movie);
-    response.send(result);
-  });
+  console.log("request.params", request.params);
+  const { id } = request.params;
+  //db.movies.deleteOne({id: "102"})
+  const result = await client
+    .db("b27we")
+    .collection("movies")
+    .deleteOne({ id: id });
+  console.log(result);
+  response.send(result);
+});
+
+app.put("/movies/:id", async function (request, response) {
+  console.log("request.params", request.params);
+  const { id } = request.params;
+  const updateData = request.body;
+  //db.movies.updateOne({id: "104"}, {$set: updateData})
+  const result = await client
+    .db("b27we")
+    .collection("movies")
+    .updateOne({ id: id }, { $set: updateData });
+  console.log(result);
+  response.send(result);
+});
 
 app.post("/movies", async function (request, response) {
-    const newMovies = request.body;
-    console.log(newMovies);
-    // db.movies.insertMany(data)
-    const result = await client
-        .db("b27we")
-        .collection("movies")
-        .insertMany(newMovies);
-    response.send(result);
-  });
+  const newMovies = request.body;
+  console.log(newMovies);
+  // db.movies.insertMany(data)
+  const result = await client
+    .db("b27we")
+    .collection("movies")
+    .insertMany(newMovies);
+  response.send(result);
+});
 
 app.listen(PORT, () => console.log(`Server is started in ${PORT}`));
 
