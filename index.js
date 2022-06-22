@@ -11,7 +11,9 @@ console.log(process.env.MONGO_URL);
 const app = express();
 
 // we cannot run both the react and node server with same port number so that is why we changed to 4000.
-const PORT = 4000;
+// y
+
+const PORT = process.env.PORT;
 
 const movies = [
   {
@@ -88,7 +90,7 @@ const movies = [
 
 // Deployed url from the Atlas mongoDB
 // We have using the some process.env to get the some p details
-const MONGO_URL = process.env.MONGO_URL;
+const MONGO_URL =  process.env.MONGO_URL;
 
 async function createConnection() {
   const client = new MongoClient(MONGO_URL);
