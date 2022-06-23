@@ -1,12 +1,21 @@
+import express from "express";
+import {createMovies, 
+    updateMovieById, 
+    deleteMovieById, 
+    getMovieById, 
+    getAllMovies} from "../helper.js";
+
+const router = express.Router();
+
 // Curosor -> pagination
-app.get("/movies", async function (request, response) {
+router.get("/", async function (request, response) {
     //db.movies.find({})
     const movies = await getAllMovies(); // converts cursor to array
     response.send(movies);
   });
   
   // :id we are passing to get only that movie details
-app.get("/movies/:id", async function (request, response) {
+router.get("/:id", async function (request, response) {
     console.log("request.params", request.params);
     const { id } = request.params;
     //db.movies.findOne({id: "104"})
@@ -18,7 +27,7 @@ app.get("/movies/:id", async function (request, response) {
       : response.status(404).send({ message: "No such movie found 😊" });
   });
   
-app.delete("/movies/:id", async function (request, response) {
+router.delete("/:id", async function (request, response) {
     console.log("request.params", request.params);
     const { id } = request.params;
     //db.movies.deleteOne({id: "102"})
@@ -27,7 +36,7 @@ app.delete("/movies/:id", async function (request, response) {
     response.send(result);
   });
   
-app.put("/movies/:id", async function (request, response) {
+router.put("/:id", async function (request, response) {
     console.log("request.params", request.params);
     const { id } = request.params;
     const updateData = request.body;
@@ -37,10 +46,12 @@ app.put("/movies/:id", async function (request, response) {
     response.send(result);
   });
   
-app.post("/movies", async function (request, response) {
+router.post("/", async function (request, response) {
     const newMovies = request.body;
     console.log(newMovies);
     // db.movies.insertMany(data)
     const result = await createMovies(newMovies);
     response.send(result);
   });
+
+export const moviesRouter = router;

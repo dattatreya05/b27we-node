@@ -3,13 +3,9 @@
 import express from "express"; // "type": "module",
 import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
-import {createMovies, 
-  updateMovieById, 
-  deleteMovieById, 
-  getMovieById, 
-  getAllMovies} from "./helper.js";
 
 import cors from "cors";
+import { moviesRouter } from "./routes/movies.js";
 
 dotenv.config();
 console.log(process.env.MONGO_URL);
