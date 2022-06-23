@@ -3,6 +3,12 @@
 import express from "express"; // "type": "module",
 import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
+import {createMovies, 
+  updateMovieById, 
+  deleteMovieById, 
+  getMovieById, 
+  getAllMovies} from "./helper.js";
+
 import cors from "cors";
 
 dotenv.config();
@@ -100,7 +106,7 @@ async function createConnection() {
   return client; // becuase we are required to connect to client
 }
 // we have done globally to access by adding to some variable and await
-const client = await createConnection();
+export const client = await createConnection();
 
 app.use(cors()) // cors -> third party middleware
 
@@ -119,11 +125,7 @@ app.get("/", function (request, response) {
 // Curosor -> pagination
 app.get("/movies", async function (request, response) {
   //db.movies.find({})
-  const movies = await client
-    .db("b27we")
-    .collection("movies")
-    .find({})
-    .toArray(); // converts cursor to array
+  const movies = await getAllMovies(); // converts cursor to array
   response.send(movies);
 });
 
@@ -132,10 +134,7 @@ app.get("/movies/:id", async function (request, response) {
   console.log("request.params", request.params);
   const { id } = request.params;
   //db.movies.findOne({id: "104"})
-  const movie = await client
-    .db("b27we")
-    .collection("movies")
-    .findOne({ id: id });
+  const movie = await getMovieById(id);
   console.log(movie);
   // const movie = movies.find((mv) => mv.id === id);
   movie
@@ -147,10 +146,7 @@ app.delete("/movies/:id", async function (request, response) {
   console.log("request.params", request.params);
   const { id } = request.params;
   //db.movies.deleteOne({id: "102"})
-  const result = await client
-    .db("b27we")
-    .collection("movies")
-    .deleteOne({ id: id });
+  const result = await deleteMovieById(id);
   console.log(result);
   response.send(result);
 });
@@ -160,10 +156,7 @@ app.put("/movies/:id", async function (request, response) {
   const { id } = request.params;
   const updateData = request.body;
   //db.movies.updateOne({id: "104"}, {$set: updateData})
-  const result = await client
-    .db("b27we")
-    .collection("movies")
-    .updateOne({ id: id }, { $set: updateData });
+  const result = await updateMovieById(id, updateData);
   console.log(result);
   response.send(result);
 });
@@ -172,13 +165,12 @@ app.post("/movies", async function (request, response) {
   const newMovies = request.body;
   console.log(newMovies);
   // db.movies.insertMany(data)
-  const result = await client
-    .db("b27we")
-    .collection("movies")
-    .insertMany(newMovies);
+  const result = await createMovies(newMovies);
   response.send(result);
 });
 
 app.listen(PORT, () => console.log(`Server is started in ${PORT}`));
+
+
 
 // ctrl+c - to kill the server and restart it.
