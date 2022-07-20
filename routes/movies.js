@@ -9,14 +9,14 @@ import { auth } from "../middleware/auth.js";
 const router = express.Router();
 
 // Curosor -> pagination
-router.get("/", auth, async function (request, response) {
+router.get("/", async function (request, response) {
     //db.movies.find({})
     const movies = await getAllMovies(); // converts cursor to array
     response.send(movies);
   });
   
   // :id we are passing to get only that movie details
-router.get("/:id", auth, async function (request, response) {
+router.get("/:id", async function (request, response) {
     console.log("request.params", request.params);
     const { id } = request.params;
     //db.movies.findOne({id: "104"})
@@ -28,7 +28,7 @@ router.get("/:id", auth, async function (request, response) {
       : response.status(404).send({ message: "No such movie found 😊" });
   });
   
-router.delete("/:id", auth, async function (request, response) {
+router.delete("/:id", async function (request, response) {
     console.log("request.params", request.params);
     const { id } = request.params;
     //db.movies.deleteOne({id: "102"})
@@ -37,7 +37,7 @@ router.delete("/:id", auth, async function (request, response) {
     response.send(result);
   });
   
-router.put("/:id", auth, async function (request, response) {
+router.put("/:id", async function (request, response) {
     console.log("request.params", request.params);
     const { id } = request.params;
     const updateData = request.body;
@@ -47,7 +47,7 @@ router.put("/:id", auth, async function (request, response) {
     response.send(result);
   });
   
-router.post("/", auth, async function (request, response) {
+router.post("/", async function (request, response) {
     const newMovies = request.body;
     console.log(newMovies);
     // db.movies.insertMany(data)
