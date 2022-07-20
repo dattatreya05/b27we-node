@@ -4,8 +4,10 @@ import express from "express"; // "type": "module",
 import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
 
+
 import cors from "cors";
 import { moviesRouter } from "./routes/movies.js";
+import { usersRouter } from "./routes/users.js";
 
 dotenv.config();
 console.log(process.env.MONGO_URL);
@@ -120,8 +122,11 @@ app.get("/", function (request, response) {
 
 app.use('/movies', moviesRouter);
 
+app.use('/users', usersRouter);
+
 app.listen(PORT, () => console.log(`Server is started in ${PORT}`));
 
 
 
 // ctrl+c - to kill the server and restart it.
+
